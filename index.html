@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRC Education Access Dashboard</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        .sidebar {
+            width: 350px;
+            background: white;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .stats-box {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .stats-box h3 {
+            color: #2e7d32;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .stats-box p {
+            color: #555;
+            font-size: 13px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .data-table th {
+            background: #2196f3;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-size: 12px;
+        }
+        
+        .data-table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            font-size: 12px;
+        }
+        
+        .data-table tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .risk-high {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        
+        .risk-medium {
+            color: #f57c00;
+            font-weight: bold;
+        }
+        
+        .risk-low {
+            color: #388e3c;
+            font-weight: bold;
+        }
+        
+        .legend {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .legend h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .info-popup {
+            background: white;
+            padding: 12px;
+            border-radius: 5px;
+            max-width: 200px;
+        }
+        
+        .info-popup h4 {
+            color: #2196f3;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar with Info and Data -->
+        <div class="sidebar">
+            <h1>🗺️ DRC Education</h1>
+            
+            <div class="legend">
+                <h3>Risk Levels:</h3>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #d32f2f;"></div>
+                    <span>Very High Risk</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f57c00;"></div>
+                    <span>High Risk</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #fbc02d;"></div>
+                    <span>Medium Risk</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #388e3c;"></div>
+                    <span>Low Risk</span>
+                </div>
+            </div>
+            
+            <div class="stats-box">
+                <h3>📊 Summary Statistics</h3>
+                <p><strong>Total Regions:</strong> <span id="total-regions">0</span></p>
+                <p><strong>Avg Education Access:</strong> <span id="avg-access">0</span>%</p>
+            </div>
+            
+            <h3 style="margin-top: 20px; margin-bottom: 10px;">📍 Data Table</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Region</th>
+                        <th>Risk</th>
+                        <th>Access</th>
+                    </tr>
+                </thead>
+                <tbody id="data-tbody">
+                    <!-- Will be filled by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Map Container -->
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+    </div>
+    
+    <!-- Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    
+    <script>
+        // Sample DRC data with approximate coordinates
+        const drcData = [
+            {
+                name: "Central Africa",
+                region: "Central Africa",
+                riskLevel: "Very High",
+                educationAccess: 28,
+                lat: -0.8,
+                lng: 23.5
+            },
+            {
+                name: "Eastern Region",
+                region: "Eastern Region",
+                riskLevel: "High",
+                educationAccess: 35,
+                lat: -0.5,
+                lng: 27.0
+            },
+            {
+                name: "Western Region",
+                region: "Western Region",
+                riskLevel: "Very High",
+                educationAccess: 22,
+                lat: -1.0,
+                lng: 17.0
+            },
+            {
+                name: "Southern Region",
+                region: "Southern Region",
+                riskLevel: "Medium",
+                educationAccess: 40,
+                lat: -2.5,
+                lng: 24.0
+            }
+        ];
+        
+        // Initialize map
+        const map = L.map('map').setView([-1.0, 22.5], 6);
+        
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+        
+        // Function to get color based on risk level
+        function getRiskColor(riskLevel) {
+            switch(riskLevel) {
+                case 'Very High':
+                    return '#d32f2f';
+                case 'High':
+                    return '#f57c00';
+                case 'Medium':
+                    return '#fbc02d';
+                case 'Low':
+                    return '#388e3c';
+                default:
+                    return '#999';
+            }
+        }
+        
+        // Add markers to map
+        drcData.forEach(location => {
+            const marker = L.circleMarker([location.lat, location.lng], {
+                radius: 15 + (location.educationAccess / 4),
+                fillColor: getRiskColor(location.riskLevel),
+                color: '#000',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(map);
+            
+            // Add popup on marker click
+            const popupContent = `
+                <div class="info-popup">
+                    <h4>${location.region}</h4>
+                    <p><strong>Risk:</strong> ${location.riskLevel}</p>
+                    <p><strong>Access:</strong> ${location.educationAccess}%</p>
+                </div>
+            `;
+            marker.bindPopup(popupContent);
+        });
+        
+        // Populate data table
+        const tbody = document.getElementById('data-tbody');
+        drcData.forEach(location => {
+            const row = document.createElement('tr');
+            const riskClass = location.riskLevel.replace(' ', '-').toLowerCase();
+            row.innerHTML = `
+                <td>${location.region}</td>
+                <td class="risk-${riskClass}">${location.riskLevel}</td>
+                <td>${location.educationAccess}%</td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+        // Calculate and display statistics
+        const totalRegions = drcData.length;
+        const avgAccess = Math.round(drcData.reduce((sum, d) => sum + d.educationAccess, 0) / totalRegions);
+        
+        document.getElementById('total-regions').textContent = totalRegions;
+        document.getElementById('avg-access').textContent = avgAccess;
+    </script>
+</body>
+</html>
