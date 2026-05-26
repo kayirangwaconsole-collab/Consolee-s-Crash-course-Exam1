@@ -58,10 +58,18 @@ An interactive dashboard mapping education access challenges in the Democratic R
 
 ## 📁 Files in This Repository
 
-- `index.html` - Interactive dashboard (main file)
-- `filter_drc_data.py` - Python script to filter DRC data
-- `sample_education_data.csv` - Sample education data
-- `DRC_education_corridors.csv` - Filtered DRC data
+```
+📦 Project Root
+├── 📄 index.html              (Interactive Dashboard - Main File)
+├── 📄 README.md               (Project Documentation)
+├── 📁 data/
+│   ├── sample_education_data.csv         (Sample input data)
+│   └── DRC_education_corridors.csv       (Filtered DRC data)
+├── 📁 scripts/
+│   └── filter_drc_data.py     (Python filter script)
+└── 📁 docs/
+    └── GITHUB_PAGES_SETUP.md  (Setup Instructions)
+```
 
 ## 🚀 Getting Started
 
@@ -75,9 +83,10 @@ Just visit: https://kayirangwaconsole-collab.github.io/Consolee-s-Crash-course-E
 
 ### Use the Python Script
 ```bash
+cd scripts/
 python filter_drc_data.py
 ```
-This creates `DRC_education_corridors.csv` with filtered data.
+This creates `data/DRC_education_corridors.csv` with filtered data.
 
 ## 📖 Understanding the Data
 

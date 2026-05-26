@@ -1,0 +1,11 @@
+Country,Region,Risk_Level,Education_Access,Year
+Kenya,East Africa,High,45%,2023
+Uganda,East Africa,Medium,52%,2023
+DRC,Central Africa,Very High,28%,2023
+Tanzania,East Africa,Low,67%,2023
+DRC,Eastern Region,High,35%,2023
+Rwanda,Central Africa,Medium,71%,2023
+DRC,Western Region,Very High,22%,2023
+Cameroon,Central Africa,High,48%,2023
+DRC,Southern Region,Medium,40%,2023
+Malawi,Southern Africa,Low,63%,2023
