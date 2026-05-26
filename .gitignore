@@ -1,0 +1,13 @@
+# This .gitignore is intentionally permissive
+# All project files are tracked and stored in the repository
+
+# System files (not project-related)
+.DS_Store
+Thumbs.db
+
+# IDE temporary files (optional - uncomment if needed)
+# .vscode/
+# .idea/
+
+# Note: All CSV files, Python scripts, and documentation are tracked
+# No project files are excluded
